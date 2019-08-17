@@ -2,29 +2,13 @@
 
 [![sampctl](https://shields.southcla.ws/badge/sampctl-nDialog-2f2f2f.svg?style=for-the-badge)](https://github.com/Shiska/nDialog)
 
-<!--
-Short description of your library, why it's useful, some examples, pictures or
-videos. Link to your forum release thread too.
+Dialog system similar to easyDialog but
 
-Remember: You can use "forumfmt" to convert this readme to forum BBCode!
+* No OnDialogPerformed, never saw any use for it, just put the code directly into the dialog
+* No format parameters in Dialog_Show, just format the string before calling the dialog
+* Uses ***ndi_*** instead of ***debug_*** as function prefix, you shouldn't call them manually anyways
 
-What the sections below should be used for:
-
-`## Installation`: Leave this section un-edited unless you have some specific
-additional installation procedure.
-
-`## Testing`: Whether your library is tested with a simple `main()` and `print`,
-unit-tested, or demonstrated via prompting the player to connect, you should
-include some basic information for users to try out your code in some way.
-
-And finally, maintaining your version number`:
-
-* Follow [Semantic Versioning](https://semver.org/)
-* When you release a new version, update `VERSION` and `git tag` it
-* Versioning is important for sampctl to use the version control features
-
-Happy Pawning!
--->
+Raison d'être: Just releasing old stuff which might by useful for someone
 
 ## Installation
 
@@ -40,14 +24,38 @@ Include in your code and begin using the library:
 #include <nDialog>
 ```
 
-## Usage
+## Functions
 
-<!--
-Write your code documentation or examples here. If your library is documented in
-the source code, direct users there. If not, list your API and describe it well
-in this section. If your library is passive and has no API, simply omit this
-section.
--->
+Similar to easyDialog
+
+```pawn
+native Dialog_Show(const playerid, _FUNCTION_, const style, const caption[], const info[], const button1[], const button2[]);
+native Dialog_Close(const playerid);
+native Dialog_Opened(const playerid);
+```
+
+Additional functions for OnDialogRepsonse  
+Could be used to replicate OnDialogPerformed by using ndi_IsDialog
+
+```pawn
+// To check if the dialogid is part of the system
+ndi_IsDialog(const dialogid);
+// To get the dialog name (function name without prefix) of the dialogid
+ndi_GetDialogName(const dialogid, buffer[32]);
+```
+
+## Example
+
+To call the dialog
+```pawn
+Dialog_Show(playerid, MyDialog, DIALOG_STYLE_MSGBOX, "Caption", "Info", "Ok", "");
+```
+With the matching function handle called "MyDialog"
+```pawn
+Dialog:MyDialog(playerid, response, listitem, inputtext[]) {
+    //code
+}
+```
 
 ## Testing
 

@@ -29,6 +29,10 @@ static
     iDialogName[MAX_PLAYERS] = {-1, ...} /// <summary>Stores the funcidx of the functionname</summar>
 ;
 
+native Dialog_Show(const playerid, _FUNCTION_, const style, const caption[], const info[], const button1[], const button2[]);
+native Dialog_Close(const playerid);
+native Dialog_Opened(const playerid);
+
 #define Dialog:%0(%1) forward public ndi_%0(%1);public ndi_%0(%1)
 #define Dialog_Show(%0,%1, ndi_ShowPlayerDialog(%0, "ndi_" #%1,
 #define Dialog_Close ndi_HidePlayerDialog
@@ -138,8 +142,6 @@ static __ndi_OnDialogResponse(playerid, dialogid, response, listitem, & inputtex
     /// <returns>Same as OnDialogResponse</returns>
     /// <seealso name="OnDialogResponse"/>
 
-    #pragma unused dialogid
-
     #emit push.s inputtext
     #emit const.alt iDialogName
     #emit load.s.pri playerid
@@ -159,9 +161,9 @@ static __ndi_OnDialogResponse(playerid, dialogid, response, listitem, & inputtex
         #emit const.alt n1
         #emit sref.s.alt inputtext
         // restore inputtext
-        #emit pop.alt // pick doesn't exists in this version :/
+        #emit pop.alt // #emit pick doesn't exists in this version
         // push parameter
-        #emit push.alt
+        #emit push.alt // so I have to pop and push it :/
         #emit push.s listitem
         #emit push.s response
         #emit push.s playerid
@@ -176,6 +178,12 @@ static __ndi_OnDialogResponse(playerid, dialogid, response, listitem, & inputtex
 }
 
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[]) { // gets only called once
+    #if defined _ALS_OnDialogResponse
+        #undef OnDialogResponse
+    #else
+        #define _ALS_OnDialogResponse
+    #endif
+    #define OnDialogResponse _ndi_OnDialogResponse_
     // get base address of publics table
     #emit lctrl 1 // dat
     #emit move.alt
@@ -205,7 +213,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[]) { /
     #emit add
     #emit sref.pri pDialogResponse
     // funcindex of next DialogResponse
-    pDialogResponse = funcidx("ndi_OnDialogResponse");
+    pDialogResponse = funcidx(#OnDialogResponse);
     // if exists calculate and load final function address
     if(pDialogResponse != -1) {
         #emit load.pri pDialogResponse
@@ -228,11 +236,5 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[]) { /
 
     return true;
 }
-#if defined _ALS_OnDialogResponse
-    #undef OnDialogResponse
-#else
-    #define _ALS_OnDialogResponse
-#endif
-#define OnDialogResponse ndi_OnDialogResponse
 
 forward public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[]);
